@@ -4,6 +4,7 @@ using System.Text;
 using CurrencyConverterService.Models;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace CurrencyConverterService
 {
@@ -11,30 +12,28 @@ namespace CurrencyConverterService
     {
         static bool serviceWork = true;
         const int interwal = 100000;
+        StreamWriter logging = new StreamWriter("Log.txt", FileMode.OpenOrCreate);
 
         public void Start()
         {
             Console.WriteLine("Servis start");
+            logging.WriteLine();
+            var currencys = new CurrencysRecipient();
+            var currencyRefreshing = new CurrencyRefreshing();
+            currencyRefreshing.AddCurrencyForNBRB(currencys.GetCurrencysNBRB());
             while (serviceWork)
             {
-                try
-                {
-                    Run();                    
-                    Thread.Sleep(interwal);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
+                Run();                    
+                Thread.Sleep(interwal);
             }
         }
 
         private void Run()
         {
-            RatesRecipient ratesRecipient = new RatesRecipient();
-            RatesRefreshing ratesRefreshing = new RatesRefreshing();
+            var ratesRecipient = new RatesRecipient();
+            var ratesRefreshing = new RatesRefreshing();
             ratesRefreshing.AddRates(ratesRecipient.GetRatesFromNBRB());
-            Console.WriteLine("Received data from NBRB");
+            Console.WriteLine("Updating the NBRB database");
         }
     }
 }

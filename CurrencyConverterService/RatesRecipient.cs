@@ -22,48 +22,80 @@ namespace CurrencyConverterService.Models
 
         public List<Rates> GetRatesFromNBRB()
         {
-            List<Rates> rates = new List<Rates>();
-            foreach (var currencyNumber in currencyNumbers())
+            var rates = new List<Rates>();
+            foreach (var currencyNumber in CurrencyNumbers())
             {
-                if (LastDate(currencyNumber).ToString("yyyy-M-d") != DateTime.Now.ToString("yyyy-M-d"))
+                if (LastDate(currencyNumber.Key).ToString("yyyy-M-d") != DateTime.Today.AddDays(+1).ToString("yyyy-M-d"))
                 {
-                    string Http = $"http://www.nbrb.by/API/ExRates/Rates/Dynamics/" +
-                    $"{currencyNumber}?startDate={LastDate(currencyNumber).ToString("yyyy-M-d")}&endDate={DateTime.Now.ToString("yyyy-M-d")}";
-                    WebRequest request = WebRequest.Create(Http);
-                    request.Method = "GET";
-                    HttpWebResponse responseObjectGet = null;
-                    responseObjectGet = (HttpWebResponse)request.GetResponse();
-                    string json = null;
-                    using (Stream stream = responseObjectGet.GetResponseStream())
+                    try
                     {
-                        StreamReader streamReader = new StreamReader(stream);
-                        json = streamReader.ReadToEnd();
-                        streamReader.Close();
+                        var Http = $"http://www.nbrb.by/API/ExRates/Rates/Dynamics/" +
+                        $"{currencyNumber.Value}?startDate={LastDate(currencyNumber.Key).ToString("yyyy-M-d")}&endDate={DateTime.Now.ToString("yyyy-M-d")}";
+                        var request = WebRequest.Create(Http);
+                        request.Method = "GET";
+                        HttpWebResponse responseObjectGet = null;
+                        responseObjectGet = (HttpWebResponse)request.GetResponse();
+                        string json = null;
+                        using (var stream = responseObjectGet.GetResponseStream())
+                        {
+                            var streamReader = new StreamReader(stream);
+                            json = streamReader.ReadToEnd();
+                            streamReader.Close();
+                        }
+                        foreach (var rate in JsonConvert.DeserializeObject<List<Rates>>(json))
+                        {
+                            rate.Bit = rate.Ask;
+                            rate.CurrencyId = currencyNumber.Key;
+                            rates.Add(rate);
+                        }
                     }
-                    foreach (var rate in JsonConvert.DeserializeObject<List<Rates>>(json))
+                    catch (Exception exception)
                     {
-                        rate.Bit = rate.Ask;
-                        rate.CurrencyId = currencyNumber;
-                        rates.Add(rate);
+                        Console.WriteLine(exception);
                     }
+                    
                 }
-                else if (LastDate(currencyNumber).ToString("yyyy-M-d") == DateTime.Now.ToString("yyyy-M-d"))
+                else if (LastDate(currencyNumber.Key).ToString("yyyy-M-d") == DateTime.Now.AddDays(+1).ToString("yyyy-M-d"))
                 {
                     continue;
                 }
             }
             return rates;
         }
-
-        private List<int> currencyNumbers()
+        
+        private Dictionary<int, int> CurrencyNumbers()
         {
-            IEnumerable<Currency> currencies = dataBase.Currencies;
-            List<int> currencysNumbers = new List<int>();
-            foreach (var currencie in currencies)
+            var currencys = new CurrencysRecipient();
+            IEnumerable<Currency> currencysDB = dataBase.Currencies;
+            var currencyNumbers = new Dictionary<int, int>();
+            var CurrencysNBRB = currencys.GetCurrencysNBRB();
+            var Name = new List<string>();
+
+            foreach (var currencyDB in currencysDB)
             {
-                currencysNumbers.Add(currencie.Id);
+                try
+                {
+                    if ((Name.Where(name => name == currencyDB.Name).Count() > 0))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        var currencysIdBD = currencysDB.Where(currencyscy => currencyscy.Name == currencyDB.Name).Select(currencyscy => currencyscy.Id);
+                        var currencysId = CurrencysNBRB.Where(currencyscy => currencyscy.Cur_Abbreviation == currencyDB.Name).Select(currencyscy => currencyscy.Cur_ID);
+                        for (var i = 0; i < currencysIdBD.Count(); i++)
+                        {
+                            currencyNumbers.Add(currencysIdBD.ElementAt(i), currencysId.ElementAt(i));
+                        }
+                        Name.Add(currencyDB.Name);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                }
             }
-            return currencysNumbers;
+            return currencyNumbers;
         }
 
         private DateTime LastDate(int currencyNumber)
@@ -72,12 +104,12 @@ namespace CurrencyConverterService.Models
             var Date = rates.Where(rate => rate.CurrencyId == currencyNumber).OrderByDescending(rate => rate.Date);
             if (Date.Count() == 0)
             {
-                DateTime date = new DateTime(2019,1,1);
+                var date = new DateTime(2019, 1, 1);
                 return date;
             }
             else
             {
-                return Date.First().Date;
+                return Date.First().Date.AddDays(+1);
             }
         }
     }

@@ -17,12 +17,7 @@ namespace CurrencyConverterService
     {
         static void Main(string[] args)
         {
-            /*
-            RatesRecipient ratesRecipient = new RatesRecipient();
-            RatesRefreshing ratesRefreshing = new RatesRefreshing();
-            ratesRefreshing.AddRates(ratesRecipient.GetRatesFromNBRB());
-            */
-            Service service = new Service();
+            var service = new Service();
             service.Start();
         }
     }

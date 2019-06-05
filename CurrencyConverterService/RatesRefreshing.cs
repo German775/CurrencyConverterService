@@ -14,11 +14,18 @@ namespace CurrencyConverterService.Models
         }
         public void AddRates(List<Rates> rates)
         {
-            foreach (var rate in rates)
+            try
             {
-                dataBase.Rates.Add(rate);
+                foreach (var rate in rates)
+                {
+                    dataBase.Rates.Add(rate);
+                }
+                dataBase.SaveChanges();
             }
-            dataBase.SaveChanges();
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
         }
     }
 }
