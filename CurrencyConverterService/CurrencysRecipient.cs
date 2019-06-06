@@ -10,9 +10,17 @@ namespace CurrencyConverterService
 {
     class CurrencysRecipient
     {
+        public Logging logging;
+        public List<CurrencyNBRB> currencyNBRB;
+
+        public CurrencysRecipient()
+        {
+            this.logging = new Logging();
+            this.currencyNBRB = new List<CurrencyNBRB>();
+        }
+
         public List<CurrencyNBRB> GetCurrencysNBRB()
         {
-            var currencyNBRB = new List<CurrencyNBRB>();
             try
             {
                 var Http = "http://www.nbrb.by/API/ExRates/Currencies";
@@ -34,7 +42,7 @@ namespace CurrencyConverterService
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+                logging.AddError(exception.ToString());
             }
             return currencyNBRB;
         }

@@ -10,9 +10,11 @@ namespace CurrencyConverterService
     class CurrencyRefreshing
     {
         Context dataBase;
+        Logging logging;
         public CurrencyRefreshing()
         {
-            this.dataBase= new Context();
+            this.dataBase = new Context();
+            this.logging = new Logging();
         }
         public void AddCurrencyForNBRB(List<CurrencyNBRB> currencysNBRB)
         {
@@ -37,11 +39,12 @@ namespace CurrencyConverterService
                         dataBase.Currencies.Add(currency);
                     }
                     dataBase.SaveChanges();
+                    logging.AddInformation("Currency table updated");
                 }
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+                logging.AddError(exception.ToString());
             }
         }
     }

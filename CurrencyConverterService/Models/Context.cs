@@ -7,6 +7,10 @@ namespace CurrencyConverterService.Models
 {
     class Context : DbContext
     {
+        public Context()
+        {
+            Database.EnsureCreated();
+        }
         public DbSet<Bank> Banks { get; set; }
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<Rates> Rates { get; set; }

@@ -8,9 +8,11 @@ namespace CurrencyConverterService.Models
     class RatesRefreshing
     {
         Context dataBase;
+        Logging logging;
         public RatesRefreshing()
         {
             dataBase = new Context();
+            this.logging = new Logging();
         }
         public void AddRates(List<Rates> rates)
         {
@@ -21,10 +23,11 @@ namespace CurrencyConverterService.Models
                     dataBase.Rates.Add(rate);
                 }
                 dataBase.SaveChanges();
+                logging.AddInformation("Rates table updated");
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+                logging.AddError(exception.ToString());
             }
         }
     }

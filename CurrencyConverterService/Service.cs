@@ -4,36 +4,41 @@ using System.Text;
 using CurrencyConverterService.Models;
 using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
 
 namespace CurrencyConverterService
 {
     class Service
     {
-        static bool serviceWork = true;
-        const int interwal = 100000;
-        StreamWriter logging = new StreamWriter("Log.txt", FileMode.OpenOrCreate);
+        public static bool serviceWork = true;
+        public const int interwal = 100000;
+        public Logging logging;
+        public CurrencysRecipient currencys;
+        public CurrencyRefreshing currencyRefreshing;
+        public RatesRecipient ratesRecipient;
+        public RatesRefreshing ratesRefreshing;
+        public Service()
+        {
+            this.logging = new Logging();
+            this.currencys = new CurrencysRecipient();
+            this.currencyRefreshing = new CurrencyRefreshing();
+            this.ratesRecipient = new RatesRecipient();
+            this.ratesRefreshing = new RatesRefreshing();
+        }
 
         public void Start()
         {
-            Console.WriteLine("Servis start");
-            logging.WriteLine();
-            var currencys = new CurrencysRecipient();
-            var currencyRefreshing = new CurrencyRefreshing();
+            logging.AddInformation("Servis start");
             currencyRefreshing.AddCurrencyForNBRB(currencys.GetCurrencysNBRB());
             while (serviceWork)
             {
-                Run();                    
+                RunService();
                 Thread.Sleep(interwal);
             }
         }
 
-        private void Run()
+        private void RunService()
         {
-            var ratesRecipient = new RatesRecipient();
-            var ratesRefreshing = new RatesRefreshing();
             ratesRefreshing.AddRates(ratesRecipient.GetRatesFromNBRB());
-            Console.WriteLine("Updating the NBRB database");
         }
     }
 }

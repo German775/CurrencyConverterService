@@ -14,15 +14,24 @@ namespace CurrencyConverterService.Models
     class RatesRecipient
     {
         Context dataBase;
-
+        Logging logging;
+        List<Rates> rates;
+        CurrencysRecipient currencys;
+        IEnumerable<Currency> currencysDB;
+        Dictionary<int, int> currencyNumbers;
+        List<string> Name;
         public RatesRecipient()
         {
             this.dataBase = new Context();
+            this.logging = new Logging();
+            this.rates = new List<Rates>();
+            this.currencys = new CurrencysRecipient();
+            this.currencyNumbers = new Dictionary<int, int>();
+            this.Name = new List<string>();
         }
 
         public List<Rates> GetRatesFromNBRB()
         {
-            var rates = new List<Rates>();
             foreach (var currencyNumber in CurrencyNumbers())
             {
                 if (LastDate(currencyNumber.Key).ToString("yyyy-M-d") != DateTime.Today.AddDays(+1).ToString("yyyy-M-d"))
@@ -51,7 +60,7 @@ namespace CurrencyConverterService.Models
                     }
                     catch (Exception exception)
                     {
-                        Console.WriteLine(exception);
+                        logging.AddError(exception.ToString());
                     }
                     
                 }
@@ -65,12 +74,8 @@ namespace CurrencyConverterService.Models
         
         private Dictionary<int, int> CurrencyNumbers()
         {
-            var currencys = new CurrencysRecipient();
-            IEnumerable<Currency> currencysDB = dataBase.Currencies;
-            var currencyNumbers = new Dictionary<int, int>();
-            var CurrencysNBRB = currencys.GetCurrencysNBRB();
-            var Name = new List<string>();
-
+            currencysDB = dataBase.Currencies;
+            var currencysNBRB = currencys.GetCurrencysNBRB();
             foreach (var currencyDB in currencysDB)
             {
                 try
@@ -82,7 +87,7 @@ namespace CurrencyConverterService.Models
                     else
                     {
                         var currencysIdBD = currencysDB.Where(currencyscy => currencyscy.Name == currencyDB.Name).Select(currencyscy => currencyscy.Id);
-                        var currencysId = CurrencysNBRB.Where(currencyscy => currencyscy.Cur_Abbreviation == currencyDB.Name).Select(currencyscy => currencyscy.Cur_ID);
+                        var currencysId = currencysNBRB.Where(currencyscy => currencyscy.Cur_Abbreviation == currencyDB.Name).Select(currencyscy => currencyscy.Cur_ID);
                         for (var i = 0; i < currencysIdBD.Count(); i++)
                         {
                             currencyNumbers.Add(currencysIdBD.ElementAt(i), currencysId.ElementAt(i));
@@ -92,7 +97,7 @@ namespace CurrencyConverterService.Models
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception);
+                    logging.AddError(exception.ToString());
                 }
             }
             return currencyNumbers;
@@ -101,15 +106,15 @@ namespace CurrencyConverterService.Models
         private DateTime LastDate(int currencyNumber)
         {
             IEnumerable<Rates> rates = dataBase.Rates;
-            var Date = rates.Where(rate => rate.CurrencyId == currencyNumber).OrderByDescending(rate => rate.Date);
-            if (Date.Count() == 0)
+            var date = rates.Where(rate => rate.CurrencyId == currencyNumber).OrderByDescending(rate => rate.Date);
+            if (date.Count() == 0)
             {
-                var date = new DateTime(2019, 1, 1);
-                return date;
+                var startDate = new DateTime(2019, 1, 1);
+                return startDate;
             }
             else
             {
-                return Date.First().Date.AddDays(+1);
+                return date.First().Date.AddDays(+1);
             }
         }
     }

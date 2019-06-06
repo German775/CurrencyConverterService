@@ -16,8 +16,6 @@ namespace CurrencyConverterService.Models
 
         [JsonProperty(PropertyName = "Cur_OfficialRate")]
         public double Ask { get; set; }
-
-        //[JsonProperty(PropertyName = "Cur_OfficialRates")]
         public double Bit { get; set; }
         public DateTime Date { get; set; }
         public Currency Currency { get; set; }
