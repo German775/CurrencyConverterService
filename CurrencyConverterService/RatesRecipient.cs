@@ -71,7 +71,7 @@ namespace CurrencyConverterService.Models
             }
             return rates;
         }
-        
+
         private Dictionary<int, int> CurrencyNumbers()
         {
             currencysDB = dataBase.Currencies;

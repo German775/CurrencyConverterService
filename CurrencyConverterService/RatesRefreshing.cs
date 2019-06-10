@@ -14,21 +14,14 @@ namespace CurrencyConverterService.Models
             dataBase = new Context();
             this.logging = new Logging();
         }
-        public void AddRates(List<Rates> rates)
+        public void AddRates(IEnumerable<Rates> rates)
         {
-            try
+            foreach (var rate in rates)
             {
-                foreach (var rate in rates)
-                {
-                    dataBase.Rates.Add(rate);
-                }
-                dataBase.SaveChanges();
-                logging.AddInformation("Rates table updated");
+                dataBase.Rates.Add(rate);
             }
-            catch (Exception exception)
-            {
-                logging.AddError(exception.ToString());
-            }
+            dataBase.SaveChanges();
+            logging.AddInformation("Rates table updated");
         }
     }
 }

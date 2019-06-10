@@ -9,20 +9,20 @@ namespace CurrencyConverterService
 {
     class CurrencyRefreshing
     {
-        Context dataBase;
-        Logging logging;
+        Context _dataBase;
+        Logging _logging;
         public CurrencyRefreshing()
         {
-            this.dataBase = new Context();
-            this.logging = new Logging();
+            this._dataBase = new Context();
+            this._logging = new Logging();
         }
-        public void AddCurrencyForNBRB(List<CurrencyNBRB> currencysNBRB)
+        public void AddCurrencyForNBRB(IEnumerable<CurrencyNBRB> currencysNBRB)
         {
             try
             {
                 const int numberAllCurrencies = 225;
-                IEnumerable<Bank> banks = dataBase.Banks;
-                IEnumerable<Currency> currenciesNBRB = dataBase.Currencies;
+                IEnumerable<Bank> banks = _dataBase.Banks;
+                IEnumerable<Currency> currenciesNBRB = _dataBase.Currencies;
                 var bankNBRBId = banks.Where(bank => bank.Name == "NBRB").Select(bank => bank.Id);
                 var amountBankCurrencies = currenciesNBRB.Where(currencie => currencie.BankId == bankNBRBId.FirstOrDefault()).Count();
                 if (amountBankCurrencies == numberAllCurrencies)
@@ -33,18 +33,16 @@ namespace CurrencyConverterService
                 {
                     foreach (var currencyNBRB in currencysNBRB)
                     {
-                        var currency = new Currency();
-                        currency.Name = currencyNBRB.Cur_Abbreviation;
-                        currency.BankId = 1;
-                        dataBase.Currencies.Add(currency);
+                        var currency = new Currency() { BankId = 1, Name = currencyNBRB.Cur_Abbreviation};
+                        _dataBase.Currencies.Add(currency);
                     }
-                    dataBase.SaveChanges();
-                    logging.AddInformation("Currency table updated");
+                    _dataBase.SaveChanges();
+                    _logging.AddInformation("Currency table updated");
                 }
             }
             catch (Exception exception)
             {
-                logging.AddError(exception.ToString());
+                _logging.AddError(exception.ToString());
             }
         }
     }

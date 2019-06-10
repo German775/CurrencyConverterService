@@ -6,9 +6,8 @@ using Newtonsoft.Json;
 
 namespace CurrencyConverterService
 {
-    class CurrencyNBRB
+    public class CurrencyNBRB
     {
-        [Key]
         public int Cur_ID { get; set; }
         public Nullable<int> Cur_ParentID { get; set; }
         public string Cur_Code { get; set; }
@@ -24,7 +23,7 @@ namespace CurrencyConverterService
         public string Cur_Name_EngMulti { get; set; }
         public int Cur_Scale { get; set; }
         public int Cur_Periodicity { get; set; }
-        public System.DateTime Cur_DateStart { get; set; }
-        public System.DateTime Cur_DateEnd { get; set; }
+        public DateTime Cur_DateStart { get; set; }
+        public DateTime Cur_DateEnd { get; set; }
     }
 }
