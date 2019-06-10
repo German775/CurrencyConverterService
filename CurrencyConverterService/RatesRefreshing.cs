@@ -5,23 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyConverterService.Models
 {
-    class RatesRefreshing
+    public class RatesRefreshing
     {
-        Context dataBase;
-        Logging logging;
-        public RatesRefreshing()
-        {
-            dataBase = new Context();
-            this.logging = new Logging();
-        }
         public void AddRates(IEnumerable<Rates> rates)
         {
+            var dataBase = new Context();
             foreach (var rate in rates)
             {
                 dataBase.Rates.Add(rate);
             }
             dataBase.SaveChanges();
-            logging.AddInformation("Rates table updated");
+            new Logging().AddInformation("Rates table updated");
         }
     }
 }

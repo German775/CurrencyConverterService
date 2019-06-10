@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CurrencyConverterService.Configuration
 {
-    class Config
+    public class Config
     {
         public int DataRefreshInterval { get; set; }
     }

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace CurrencyConverterService.Models
 {
-    class Rates
+    public class Rates
     {
         public int Id { get; set; }
 

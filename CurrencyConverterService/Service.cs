@@ -1,36 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CurrencyConverterService.Configuration;
 using CurrencyConverterService.Models;
-using System.Threading;
-using System.Threading.Tasks;
-using CurrencyConverterService.Configuration;
-using System.IO;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Threading;
 
 namespace CurrencyConverterService
 {
-    class Service
+    public class Service
     {
         public static bool ServiceWork = true;
-        public Logging logging;
-        public CurrencysRecipient currencys;
-        public CurrencyRefreshing currencyRefreshing;
-        public RatesRecipient ratesRecipient;
-        public RatesRefreshing ratesRefreshing;
+        public Logging Logging;
+        public CurrencyRefreshing CurrencyRefreshing;
+        public RatesRecipient RatesRecipient;
+        public RatesRefreshing RatesRefreshing;
         public Service()
         {
-            this.logging = new Logging();
-            this.currencys = new CurrencysRecipient();
-            this.currencyRefreshing = new CurrencyRefreshing();
-            this.ratesRecipient = new RatesRecipient();
-            this.ratesRefreshing = new RatesRefreshing();
+            this.Logging = new Logging();
+            this.CurrencyRefreshing = new CurrencyRefreshing();
+            this.RatesRecipient = new RatesRecipient();
+            this.RatesRefreshing = new RatesRefreshing();
         }
 
         public void Start()
         {
-            logging.AddInformation("Servis start");
-            currencyRefreshing.AddCurrencyForNBRB(currencys.GetCurrencysNBRB());
+            Logging.AddInformation("Servis start");
+            CurrencyRefreshing.AddCurrencyForNBRB(new CurrencysRecipient().GetCurrencysNBRB());
 
             while (ServiceWork)
             {
@@ -52,14 +47,14 @@ namespace CurrencyConverterService
             }
             catch (Exception exception)
             {
-                logging.AddError(exception.ToString());
+                Logging.AddError(exception.ToString());
                 return null;
             }
         }
 
         private void RunService()
         {
-            ratesRefreshing.AddRates(ratesRecipient.GetRatesFromNBRB());
+            RatesRefreshing.AddRates(RatesRecipient.GetRatesFromNBRB());
         }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyConverterService.Models
 {
-    class Context : DbContext
+    public class Context : DbContext
     {
         public Context()
         {

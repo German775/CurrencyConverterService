@@ -7,22 +7,17 @@ using System.Linq;
 
 namespace CurrencyConverterService
 {
-    class CurrencyRefreshing
+    public class CurrencyRefreshing
     {
-        Context _dataBase;
-        Logging _logging;
-        public CurrencyRefreshing()
-        {
-            this._dataBase = new Context();
-            this._logging = new Logging();
-        }
         public void AddCurrencyForNBRB(IEnumerable<CurrencyNBRB> currencysNBRB)
         {
+            var logging = new Logging();
             try
             {
                 const int numberAllCurrencies = 225;
-                IEnumerable<Bank> banks = _dataBase.Banks;
-                IEnumerable<Currency> currenciesNBRB = _dataBase.Currencies;
+                var dataBase = new Context();
+                IEnumerable<Bank> banks = dataBase.Banks;
+                IEnumerable<Currency> currenciesNBRB = dataBase.Currencies;
                 var bankNBRBId = banks.Where(bank => bank.Name == "NBRB").Select(bank => bank.Id);
                 var amountBankCurrencies = currenciesNBRB.Where(currencie => currencie.BankId == bankNBRBId.FirstOrDefault()).Count();
                 if (amountBankCurrencies == numberAllCurrencies)
@@ -34,15 +29,15 @@ namespace CurrencyConverterService
                     foreach (var currencyNBRB in currencysNBRB)
                     {
                         var currency = new Currency() { BankId = 1, Name = currencyNBRB.Cur_Abbreviation};
-                        _dataBase.Currencies.Add(currency);
+                        dataBase.Currencies.Add(currency);
                     }
-                    _dataBase.SaveChanges();
-                    _logging.AddInformation("Currency table updated");
+                    dataBase.SaveChanges();
+                    logging.AddInformation("Currency table updated");
                 }
             }
             catch (Exception exception)
             {
-                _logging.AddError(exception.ToString());
+                logging.AddError(exception.ToString());
             }
         }
     }

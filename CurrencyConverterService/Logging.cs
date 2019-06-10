@@ -6,33 +6,33 @@ using System.Text;
 
 namespace CurrencyConverterService
 {
-    class Logging 
+    public class Logging 
     {
-        ServiceProvider serviceProvider { get; set; }
-        ILogger logger { get; set; }
+        ServiceProvider ServiceProvider { get; set; }
+        ILogger Logger { get; set; }
         public Logging()
         {
-            this.serviceProvider = new ServiceCollection()
+            this.ServiceProvider = new ServiceCollection()
                 .AddLogging(cfg => cfg.AddConsole())
                 .Configure<LoggerFilterOptions>(cfg => cfg.MinLevel = LogLevel.Debug)
                 .BuildServiceProvider();
-            this.logger = serviceProvider
+            this.Logger = ServiceProvider
                 .GetService<ILogger<Program>>();
         }
 
         public void AddInformation(string message)
         {
-            logger.LogInformation($"{DateTime.Now}: {message}");
+            Logger.LogInformation($"{DateTime.Now}: {message}");
         }
 
         public void AddWarning(string message)
         {
-            logger.LogWarning($"{DateTime.Now}: {message}");
+            Logger.LogWarning($"{DateTime.Now}: {message}");
         }
 
         public void AddError(string message)
         {
-            logger.LogError($"{DateTime.Now}: {message}");
+            Logger.LogError($"{DateTime.Now}: {message}");
         }
     }
 }

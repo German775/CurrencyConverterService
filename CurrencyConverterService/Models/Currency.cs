@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CurrencyConverterService.Models
 {
-    class Currency
+    public class Currency
     {
         public int Id { get; set; }
         public int BankId { get; set; }

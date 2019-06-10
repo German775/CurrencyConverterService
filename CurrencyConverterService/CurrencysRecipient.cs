@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace CurrencyConverterService
 {
-    class CurrencysRecipient
+    public class CurrencysRecipient
     {
         public List<CurrencyNBRB> currencyNBRB;
         const string Http = "http://www.nbrb.by/API/ExRates/Currencies";
