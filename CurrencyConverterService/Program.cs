@@ -19,8 +19,7 @@ namespace CurrencyConverterService
     {
         static void Main(string[] args)
         {
-            var service = new Service();
-            service.Start();
+            new Service().Start();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,8 @@ namespace CurrencyConverterService.Models
                 dataBase.Rates.Add(rate);
             }
             dataBase.SaveChanges();
-            new Logging().AddInformation("Rates table updated");
+            var data = dataBase.Rates.Max(rate => rate.Date);
+            new Logging().AddInformation($"Rates table updated to: {data}");
         }
     }
 }

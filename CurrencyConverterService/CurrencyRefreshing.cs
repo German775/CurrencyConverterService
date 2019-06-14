@@ -15,11 +15,10 @@ namespace CurrencyConverterService
             try
             {
                 const int numberAllCurrencies = 225;
+                const string name = "NBRB";
                 var dataBase = new Context();
-                IEnumerable<Bank> banks = dataBase.Banks;
-                IEnumerable<Currency> currenciesNBRB = dataBase.Currencies;
-                var bankNBRBId = banks.Where(bank => bank.Name == "NBRB").Select(bank => bank.Id);
-                var amountBankCurrencies = currenciesNBRB.Where(currencie => currencie.BankId == bankNBRBId.FirstOrDefault()).Count();
+                var banks = dataBase.Banks;
+                var amountBankCurrencies = dataBase.Currencies.Where(currencie => currencie.BankId == banks.Where(bank => bank.Name == name).Select(bank => bank.Id).FirstOrDefault()).Count();
                 if (amountBankCurrencies == numberAllCurrencies)
                 {
                     return;

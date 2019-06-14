@@ -11,7 +11,6 @@ namespace CurrencyConverterService
     public class CurrencysRecipient
     {
         public List<CurrencyNBRB> currencyNBRB;
-        const string Http = "http://www.nbrb.by/API/ExRates/Currencies";
 
         public CurrencysRecipient()
         {
@@ -22,7 +21,7 @@ namespace CurrencyConverterService
         {
             try
             {
-                var request = WebRequest.Create(Http);
+                var request = WebRequest.Create("http://www.nbrb.by/API/ExRates/Currencies");
                 request.Method = "GET";
                 HttpWebResponse responseObjectGet = null;
                 responseObjectGet = (HttpWebResponse)request.GetResponse();

@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Net;
-using CurrencyConverterService.Models;
 using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
@@ -13,6 +9,12 @@ namespace CurrencyConverterService.Models
 {
     public class RatesRecipient
     {
+        List<string> Name;
+        public RatesRecipient()
+        {
+            this.Name = new List<string>();
+        }
+
         public List<Rates> GetRatesFromNBRB()
         {
             var rates = new List<Rates>();
@@ -35,10 +37,10 @@ namespace CurrencyConverterService.Models
                             json = streamReader.ReadToEnd();
                             streamReader.Close();
                         }
-                        foreach (var rate in JsonConvert.DeserializeObject<List<Rates>>(json))
+                        foreach (var rateNBRB in JsonConvert.DeserializeObject<List<RatesNBRB>>(json))
                         {
-                            rate.Bit = rate.Ask;
-                            rate.CurrencyId = currencyNumber.Key;
+                            var rate = new Rates(){ CurrencyId = currencyNumber.Key, Ask = rateNBRB.Cur_OfficialRate,
+                                Bit = rateNBRB.Cur_OfficialRate, Date = rateNBRB.Date};
                             rates.Add(rate);
                         }
                     }
@@ -46,7 +48,7 @@ namespace CurrencyConverterService.Models
                     {
                         new Logging().AddError(exception.ToString());
                     }
-                    
+
                 }
                 else if (LastDate(currencyNumber.Key).ToString("yyyy-M-d") == DateTime.Now.AddDays(+1).ToString("yyyy-M-d"))
                 {
@@ -58,25 +60,25 @@ namespace CurrencyConverterService.Models
 
         private Dictionary<int, int> CurrencyNumbers()
         {
-            var currencyNumbers1 = new Dictionary<int, int>();
+            var currencysNBRB = new CurrencysRecipient().GetCurrencysNBRB();
+            var currencyNumbers = new Dictionary<int, int>();
             foreach (var currencyDB in new Context().Currencies)
             {
                 try
                 {
-                    if ((new List<string>().Where(name => name == currencyDB.Name).Count() > 0))
+                    if ((Name.Where(name => name == currencyDB.Name).Count() > 0))
                     {
                         continue;
                     }
                     else
                     {
-                        for (var i = 0; i < ((IEnumerable<Currency>) new Context().Currencies).Where(Currencyscy => Currencyscy.Name == currencyDB.Name).Select(Currencyscy => Currencyscy.Id).Count(); i++)
+                        var currencysIdBD = ((IEnumerable<Currency>) new Context().Currencies).Where(currencyscy => currencyscy.Name == currencyDB.Name).Select(currencyscy => currencyscy.Id);
+                        var currencysId = currencysNBRB.Where(currencyscy => currencyscy.Cur_Abbreviation == currencyDB.Name).Select(currencyscy => currencyscy.Cur_ID);
+                        for (var i = 0; i < currencysIdBD.Count(); i++)
                         {
-                            currencyNumbers1.Add(((IEnumerable<Currency>) new Context().Currencies).Where(Currencyscy => Currencyscy.Name == currencyDB.Name).
-                                Select(currencyscy => currencyscy.Id).ElementAt(i), new CurrencysRecipient().GetCurrencysNBRB().
-                                    Where(currencyscy => currencyscy.Cur_Abbreviation == currencyDB.Name).
-                                    Select(currencyscy => currencyscy.Cur_ID).ElementAt(i));
+                            currencyNumbers.Add(currencysIdBD.ElementAt(i), currencysId.ElementAt(i));
                         }
-                        new List<string>().Add(currencyDB.Name);
+                        Name.Add(currencyDB.Name);
                     }
                 }
                 catch (Exception exception)
@@ -84,12 +86,12 @@ namespace CurrencyConverterService.Models
                     new Logging().AddError(exception.ToString());
                 }
             }
-            return currencyNumbers1;
+            return currencyNumbers;
         }
 
         private DateTime LastDate(int currencyNumber)
         {
-            IEnumerable<Rates> rates = new Context().Rates;
+            var rates = new Context().Rates;
             var date = rates.Where(rate => rate.CurrencyId == currencyNumber).OrderByDescending(rate => rate.Date);
             if (date.Count() == 0)
             {

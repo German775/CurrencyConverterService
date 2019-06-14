@@ -9,7 +9,7 @@ namespace CurrencyConverterService
     public class CurrencyNBRB
     {
         public int Cur_ID { get; set; }
-        public Nullable<int> Cur_ParentID { get; set; }
+        public int? Cur_ParentID { get; set; }
         public string Cur_Code { get; set; }
         public string Cur_Abbreviation { get; set; }
         public string Cur_Name { get; set; }
